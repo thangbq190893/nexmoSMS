@@ -1,0 +1,30 @@
+const Nexmo = require('nexmo');
+
+// kết nối nexmo bằng mã của bạn
+const nexmo = new Nexmo({
+    apiKey: '0e******',
+    apiSecret: 'yr**************',
+});
+
+function SMS() {
+    this.sendSMS = function (from, to, content, callback, res) {
+        nexmo.message.sendSms(from, to, content, {type: 'unicode'}, function (err, result){
+            if (err) {
+                console.log(err);
+            } else {
+                if (result.messages[0]['status'] === '0') {
+                    message = `
+                    Tin nhắn gửi thành công.
+                    Số tiền còn lại là : ${result.messages[0]['remaining-balance']}.
+                    Phí 1 lần gửi : ${result.messages[0]['message-price']}`;
+                    callback(message);
+                    res.send(message);
+                } else {
+                    callback('Tin nhắn gửi thất bại. Mã lỗi : '+ result.messages[0]['error-text']);
+                    res.send(result.messages[0]['error-text']);
+                }
+            }
+        })
+    }
+}
+module.exports = new SMS();
